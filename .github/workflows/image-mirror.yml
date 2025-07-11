@@ -104,12 +104,13 @@ jobs:
         if: steps.check_body.outputs.is_image_format == 'true'
         id: syncImage
         env:
-          TARGET_REGISTRY_PASSWORD: ${{ secrets.TARGET_REGISTRY_PASSWORD }}
-          TARGET_REGISTRY_USER: ${{ vars.TARGET_REGISTRY_USER }}
+          TARGET_REGISTRY_PASSWORD: "${{ secrets.TARGET_REGISTRY_PASSWORD }}"
+          TARGET_REGISTRY_USER: "${{ vars.TARGET_REGISTRY_USER }}"
+          # ALIYUN_REGISTRY: "${{ secrets.ALIYUN_REGISTRY }}"
           # TARGET_REGISTRY: index.docker.io
           # TARGET_REGISTRY: registry.cn-hangzhou.aliyuncs.com
-          TARGET_NAMESPACE: ${{ vars.TARGET_NAMESPACE }}
-          TARGET_REGISTRY: ${{ vars.TARGET_REGISTRY }}
+          TARGET_NAMESPACE: "${{ vars.TARGET_NAMESPACE }}"
+          TARGET_REGISTRY: "${{ vars.TARGET_REGISTRY }}"
         #处理body中的空格和tab和换行，并在结尾添加: ， 写入images.yml 文件
         run: | 
           echo "${{ github.event.issue.body }}" > images-init.yml 
@@ -122,8 +123,10 @@ jobs:
           for i in ${img[@]}
           do
             tagName=$(echo $i | awk -F "/" '{print $NF}');
-            echo $i: ${TARGET_REGISTRY}/${TARGET_NAMESPACE}/${tagName} >> images.yml;
-            echo ${TARGET_REGISTRY}/${TARGET_NAMESPACE}/${tagName} >> dockerhub-image.yml;
+            echo "$i: ${TARGET_REGISTRY}/${TARGET_NAMESPACE}/${tagName}" >> images.yml;
+            echo "${TARGET_REGISTRY}/${TARGET_NAMESPACE}/${tagName}" >> dockerhub-image.yml;
+            # echo $i: ${TARGET_REGISTRY}/${TARGET_NAMESPACE}/${tagName} >> images.yml;
+            # echo ${TARGET_REGISTRY}/${TARGET_NAMESPACE}/${tagName} >> dockerhub-image.yml;
           done
           cat images.yml
           ./image-syncer  --auth=./auth.yml --images=./images.yml 
